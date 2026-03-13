@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Task Scheduler</title>
+    <style>
+        /* Modern background with a subtle liquid feel */
+        body { 
+            font-family: 'Inter', -apple-system, sans-serif; 
+            background: url('https://9to5mac.com/wp-content/uploads/sites/6/2026/03/MacBook-Neo-Yellow.jpg') no-repeat center center fixed; 
+            background-size: cover;
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* The Glass Card Effect */
+        .glass-card { 
+            background: rgba(255, 255, 255, 0.15); 
+            backdrop-filter: blur(15px); 
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 24px; 
+            padding: 2.5rem; 
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+            width: 450px;
+            color: white;
+        }
+
+        h2 { text-align: center; font-weight: 300; letter-spacing: 1px; margin-bottom: 25px; }
+
+        form { display: flex; flex-direction: column; gap: 15px; }
+
+        /* Transparent glass inputs */
+        input { 
+            padding: 12px; 
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: white;
+            outline: none;
+        }
+
+        input::placeholder { color: rgba(255, 255, 255, 0.6); }
+
+        button { 
+            padding: 12px; 
+            background: rgba(255, 255, 255, 0.9); 
+            color: #333; 
+            border: none; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        button:hover { background: white; transform: translateY(-2px); }
+
+        .task-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 15px; 
+            margin-top: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border-left: 4px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .delete-btn { color: #ff6b6b; text-decoration: none; font-size: 0.85rem; font-weight: bold; }
+        
+        #notify-btn { 
+            background: rgba(255, 255, 255, 0.2); 
+            color: white; 
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        .title-logo {
+    height: 1.2em; /* This scales it exactly to the height of the text */
+    width: auto;   /* Keeps the proportions correct */
+    vertical-align: middle; /* Aligns it perfectly with the letters */
+    margin-right: 8px; /* Adds a tiny space between the logo and "Task" */
+}
+    </style>
+</head>
+<body>
+    <div class="glass-card">
+        <h2>
+    <img src="https://apei.pt/wp-content/uploads/2021/07/logo_piaget.png" alt="Logo" class="title-logo"> 
+    Task Scheduler
+</h2>
+        
+        <button id="notify-btn" onclick="requestPermission()">🔔 Enable System Notifications</button>
+        
+        <form action="/add" method="POST">
+            <input type="text" name="task" placeholder="What's the mission?" required>
+            <input type="date" name="date" required>
+            <button type="submit">Schedule Task</button>
+        </form>
+
+        <div id="task-list" style="margin-top: 30px;">
+            {% for task in tasks %}
+            <div class="task-item" data-date="{{ task.date }}">
+                <div>
+                    <strong>{{ task.content }}</strong><br>
+                    <small style="color: rgba(255,255,255,0.7);">Due: {{ task.date }}</small>
+                </div>
+                <a href="/delete/{{ task.id }}" class="delete-btn">Remove</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        function requestPermission() {
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") alert("Notifications enabled!");
+            });
+        }
+
+        setInterval(() => {
+            const today = new Date().toISOString().split('T')[0];
+            document.querySelectorAll('.task-item').forEach(item => {
+                if (item.getAttribute('data-date') === today) {
+                    alert("⏰ MISSION DUE TODAY: " + item.querySelector('strong').innerText);
+                }
+            });
+        }, 10000); 
+    </script>
+</body>
+</html>
